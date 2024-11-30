@@ -6,7 +6,6 @@ import { API } from '../../Environment';
 
 import StatTile from './StatTile/StatTile';
 import TaskTable from './TaskTable/TaskTable';
-import TaskDetailPopup from './TaskDetailPopup/TaskDetailPopup';
 import { USER_STATE } from '../../App';
 import Dropdown from '../Dropdown/Dropdown';
 
@@ -80,8 +79,6 @@ export default function Dashboard(props){
         (userState !== USER_STATE.LOGGED_IN) ? navTo('/sign-in') : fetchTaskList()
     }, []);
 
-    const [openTask, setOpenTask] = useState();
-
     const [activeStatusFilter, setActiveStatusFilter] = useState(10);
     const [activePriorityFilter, setActivePriorityFilter] = useState(10);
     const statusFilter = [{id: 10, label: 'All'}, {id: 1, label: 'Pending'}, {id: 2, label: 'In Progress'}, {id: 3, label: 'Done'}];
@@ -115,10 +112,8 @@ export default function Dashboard(props){
             </div>
 
             <   TaskTable data={taskList || []} filters={{status: activeStatusFilter, priority: activePriorityFilter}}
-                taskClickHandler={(task) => setOpenTask(task)} onTaskRefresh={() => fetchTaskList()}
+                taskClickHandler={(task) => {}} onTaskRefresh={() => fetchTaskList()}
             />
-
-            {openTask ? <TaskDetailPopup {...openTask} closeHandler={() => setOpenTask(undefined)} /> : null}
         </div>
     );
 }
