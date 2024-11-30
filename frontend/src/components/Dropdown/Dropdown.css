@@ -1,0 +1,40 @@
+.dropdown-root{
+    position: relative;
+}
+
+.dd-btn-root{
+    gap: 8px;
+}
+
+.dd-ico{
+    transform-origin: center center;
+    transition: transform 100ms linear;
+}
+
+.dd-ico-invert{
+    transform: rotate(180deg);
+}
+
+.dd-menu-root{
+    position: absolute;
+    z-index: 2;
+    top: calc(100% + 8px);
+    width: 100%;
+    padding: 4px;
+    border-radius: 12px;
+    border: 1px solid var(--shadow-colour);
+    background-color: #FFF;
+    box-shadow: 0 4px 4px var(--shadow-colour);
+}
+
+.dd-menu-item{
+    padding: 0.5em 1em;
+    border-radius: 8px;
+    /* background-color: #FFF; */
+    transition: all 100ms linear;
+}
+
+.dd-menu-item:hover{
+    color: var(--pr-accent-1);
+    background-color: var(--shadow-colour-acc-2);
+}

@@ -1,0 +1,18 @@
+#SIFRoot{
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+
+    /* height: 100%; */
+    width: 80vw;
+    max-width: 400px;
+    padding: 24px;
+    border-radius: 24px;
+    background-color: #FFF;
+    box-shadow: 0 4px 16px 8px var(--shadow-colour);
+}
+
+#SIFRoot form{
+    gap: 16px;
+}

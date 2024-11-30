@@ -1,0 +1,9 @@
+#TaskTableRoot{
+    gap: 16px;
+    padding-bottom: 72px;
+}
+
+#EmptyTable{
+    margin: 0 auto;
+    width: max-content;
+}

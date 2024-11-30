@@ -1,0 +1,24 @@
+.stat-tile-root{
+    gap: 16px;
+    padding: 12px 24px;
+    width: 200px;
+    flex-basis: 200px;
+    background-color: var(--pr-light);
+    border-radius: 16px;
+    border: 1px solid var(--shadow-colour);
+    /* box-shadow: 0 16px 20px -8px var(--shadow-colour), -1px -1px 3px var(--pr-accent-2), 1px 1px 6px var(--pr-accent-1); */
+    box-shadow: 0 16px 20px -8px var(--shadow-colour), -1px -1px 6px rgba(234, 0, 255, 0.5), 1px 1px 3px rgba(40, 10, 72, 0.75);
+}
+
+.stat-ico{
+    font-size: 48px;
+}
+
+.stat-title{
+    font-weight: 600;
+    color: var(--dark-grey);
+}
+
+.stat-count{
+    font-size: 48px;
+}

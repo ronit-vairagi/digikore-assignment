@@ -1,0 +1,39 @@
+#HeaderRoot{
+    width: 100%;
+    background-color: var(--pr-light);
+    padding: 16px 48px;
+    box-shadow: 0 4px 12px var(--shadow-colour);
+}
+
+#HRLeftSection, #HRRightSection{
+    gap: 48px;
+}
+
+#HeaderLogo{
+    height: 26px;
+    width: auto;
+    mix-blend-mode: multiply;
+}
+
+#HeaderLogo2{
+    font-size: 20px;
+    font-weight: 900;
+    /* background: linear-gradient(170deg, #F04438 40%, #CE281C); */
+    background: linear-gradient(170deg, rgba(234, 0, 255, 0.5) 40%, rgba(40, 10, 72, 0.75));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+#Title{
+    font-size: 20px;
+}
+
+@media screen and (max-width: 400px) {
+    #Title{
+        display: none;
+    }
+
+    #HeaderRoot{
+        padding: 16px 16px;
+    }
+}

@@ -1,0 +1,22 @@
+#DashboardRoot{
+    width: 80%;
+    margin: 48px auto 0 auto;
+}
+
+#DashStatsRoot{
+    gap: 48px;
+}
+
+#FiltersRoot{
+    margin-top: 48px;
+}
+
+#FiltersHeading{
+    font-size: 20px;
+    font-weight: 500;
+}
+
+.filter-dd-root{
+    width: 150px;
+    flex: 0 0 150px;
+}

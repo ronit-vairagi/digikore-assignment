@@ -1,0 +1,12 @@
+#TDPVisibleArea{
+    width: 50vw;
+    min-height: 60vh;
+}
+
+#TDPDescription {
+    overflow-wrap: break-word;
+    white-space: normal;
+    word-wrap: break-word;
+    hyphens: auto;
+}
+  

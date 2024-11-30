@@ -1,0 +1,93 @@
+.tt-row{
+    cursor: pointer;
+    padding: 16px 32px;
+    background-color: var(--pr-light);
+    border-radius: 8px;
+    box-shadow: 0 4px 8px var(--shadow-colour);
+    transition: box-shadow 250ms linear;
+}
+
+.tt-row.tt-row-head{
+    cursor: initial;
+}
+
+.tt-row:not(.tt-row-head):hover{
+    box-shadow: 0 4px 8px -4px var(--shadow-colour-acc-2), 0 4px 8px var(--shadow-colour-acc-1);
+}
+
+.tt-name{
+    flex: 0 0 240px;
+}
+
+.tt-description{
+    flex: 1 1 0;
+}
+
+.tt-priority{
+    flex: 0 0 56px;
+    text-align: left;
+    font-size: 16px;
+}
+
+
+.tt-pri-low{
+    color: #a0ffa0;
+}
+
+.tt-pri-med{
+    color: #fce14c;
+}
+
+.tt-pri-high{
+    color: #ff7860;
+}
+
+.tt-pri-low, .tt-pri-med, .tt-pri-high{
+    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.tt-status{
+    flex: 0 0 56px;
+    text-align: center;
+}
+
+.tt-row-head .tt-name, .tt-row-head .tt-description,
+.tt-row-head .tt-status, .tt-row-head .tt-priority{
+    font-weight: 600;
+    color: var(--pr-accent-1);
+}
+
+.tt-stat-pending{
+    color: var(--sys-red);
+}
+
+.tt-stat-in-progress{
+    color: var(--sys-blue);
+}
+
+.tt-stat-done{
+    color: var(--sys-green);
+}
+
+
+@media screen and (max-width: 720px) {
+    .tt-priority{
+        display: none;
+    }
+}
+
+
+@media screen and (max-width: 400px) {
+    .tt-description{
+        display: none;
+    }
+
+    .tt-name{
+        flex: 1 1 0;
+    }
+    
+    .tt-status{
+        flex: 0 0 56px;
+        text-align: right;
+    }
+}
