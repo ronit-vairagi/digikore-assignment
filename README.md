@@ -84,5 +84,5 @@ Considering the short deadline for submission, few implementations are not done:
 | API for creating a task | Done |
 | API for updating a task | Done |
 | API for deleting a task | Done |
-| Backend function for sorting the list on AI based priority ranking | Pending |
+| Backend function for sorting the list on AI based priority ranking | ~~Pending~~ Done |
 

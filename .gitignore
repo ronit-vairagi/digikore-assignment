@@ -1,7 +1,7 @@
 backend/__pycache__
+backend/.env
 frontend/node_modules
 frontend/package-lock.json
 frontend/.pnp
 *.pnp.js
-
 *.log*

@@ -1,6 +1,11 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 import pymysql
+import json
+import os
+from dotenv import load_dotenv
+from openai import OpenAI
+
 
 from enum import Enum
 import datetime as dt
@@ -8,6 +13,9 @@ import datetime as dt
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
+load_dotenv()
+GPT_KEY = os.getenv('GPT')
+client = OpenAI(api_key = GPT_KEY)
 
 # Database configuration
 app.config['DB_HOST'] = 'localhost'
@@ -15,7 +23,7 @@ app.config['DB_USER'] = 'root'
 app.config['DB_PASSWORD'] = 'kajusdb2024'
 app.config['DB_NAME'] = 'digikore'
 
-def get_db_connection():
+def getDBConnection():
     try:
         return pymysql.connect(
             host=app.config['DB_HOST'],
@@ -25,14 +33,8 @@ def get_db_connection():
             cursorclass=pymysql.cursors.DictCursor
         )
     except Exception as e:
-        print('Error @get_db_connection: ', e)
+        print('Error @getDBConnection: ', e)
 
-
-
-# UsersDB = [
-#     {"id": "ronit@ronit.com", "password": "bietheboss"},
-#     {"id": "ronit2@ronit.com", "password": "bietheboss"},
-# ]
 
 
 class PRIORITY(Enum):
@@ -55,12 +57,6 @@ class Task:
         self.priority = priority
         self.deadline = dt.datetime.strptime(deadline, '%Y-%m-%d')
 
-    # def to_dict(self):
-    #     return {
-    #         "name": self.name,
-    #         "description": self.description,
-    #         "status": self.status.value
-    #     }
 
 
 @app.route('/user/sign-in', methods=['POST'])
@@ -75,7 +71,7 @@ def signin():
         return jsonify({"status": "failed", "message": "Username and password are required"}), 400
 
     try:
-        connection = get_db_connection()
+        connection = getDBConnection()
         if(connection):
             try:
                 with connection.cursor() as cursor:
@@ -112,7 +108,7 @@ def createAccount():
         return jsonify({"status": "failed", "message": "Username and password are required"}), 400
     
     try:
-        connection = get_db_connection()
+        connection = getDBConnection()
         if(connection):
             try:
                 with connection.cursor() as cursor:
@@ -141,13 +137,11 @@ def createAccount():
 # end of createAccount()  ---------------------------------------------------------------------------------------------
 
 def fetchTasksForThisUser(username):
-    print('@fetchTasksForThisUser')
-    connection = get_db_connection()
+    connection = getDBConnection()
     if(not connection):
         return []
     
     try:
-        # print('@fetchTasksForThisUser try block')
         with connection.cursor() as cursor:
             sql = "SELECT * FROM tasks WHERE user = %s"
             cursor.execute(sql, (username,))
@@ -159,9 +153,38 @@ def fetchTasksForThisUser(username):
     finally:
         connection.close()
 
+def rankTasksByAI(tasks):
+    prompt = "Sort the following tasks in the order of importance, considering deadlines and priority:\n\n"
+    for task in tasks:
+        deadline = str(task['deadline']).split(' ')[0]
+        priority = PRIORITY(task['priority']).name
+        taskId = task['id']
+        prompt += f"TaskId : {taskId} , Deadline (YYYY-MM-DD) {deadline}, Priority: {priority}\n"
+    prompt += "\nProvide the sorted tasks as an array of taskIds (ex: [1, 13, 7]). Do not send anything else in the reponse apart from the array."
+
+    try:
+        response = client.chat.completions.create( model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are an assistant that organizes tasks."},
+                {"role": "user", "content": prompt}
+            ]
+        )
+
+        content = response.choices[0].message.content
+        try:
+            sortedTasks = json.loads(content)
+            return sortedTasks
+        except json.JSONDecodeError as e:
+            print(f"Failed to parse OpenAI API response: {e}")
+            return -1
+        
+    except Exception as e:
+        print('OpenAI API processing error :', e)
+        return -1
+
+
 @app.route('/tasks', methods=['GET'])
 def getTaskListAPI():
-    print('@getTaskListAPI')
     username = request.headers.get("Authorization")
     username = str(username)
     if(not username) :
@@ -169,24 +192,40 @@ def getTaskListAPI():
     
     try:
         tasksInDB = fetchTasksForThisUser(username)
-        taskList2 = []
-        for task in tasksInDB:
-            taskDateSplit = str(task['date_created']).split(':')
-            taskDate = taskDateSplit[0] + ':' + taskDateSplit[1]
-            deadline = task["deadline"].strftime("%Y-%m-%d")
-            taskList2.append({
-                "taskId": task['id'], "name": task['name'], "description": task['description'],
-                "status": task['status'], "date": taskDate, "priority": task["priority"], "deadline": deadline
-            })
+        try:
+            doneTasks = list( filter(lambda task: str(task['status']) == '3', tasksInDB) )
+            notDoneTasks = list( filter(lambda task: str(task['status']) != '3', tasksInDB) )
 
-        return jsonify({"taskList": taskList2}), 200
+            tasksSortedByAI = []
+            taskRanks = rankTasksByAI(notDoneTasks)
+            if(taskRanks == -1):
+                tasksSortedByAI = notDoneTasks + doneTasks
+            else:
+                prioritisedTasks = []
+                taskDict = {task['id']: task for task in notDoneTasks}
+                prioritisedTasks = [taskDict[taskID] for taskID in taskRanks]
+
+                tasksSortedByAI = prioritisedTasks + doneTasks
+
+            taskList2 = []
+            for task in tasksSortedByAI:
+                taskDateSplit = str(task['date_created']).split(':')
+                taskDate = taskDateSplit[0] + ':' + taskDateSplit[1]
+                deadline = task["deadline"].strftime("%Y-%m-%d")
+                taskList2.append({
+                    "taskId": task['id'], "name": task['name'], "description": task['description'],
+                    "status": task['status'], "date": taskDate, "priority": task["priority"], "deadline": deadline
+                })
+
+            return jsonify({"taskList": taskList2}), 200
+        except:
+            return jsonify({"status": "failed", "message": "Database access failed"}), 500
     except:
         return jsonify({"status": "failed", "message": "Something went wrong. Please try again later."}), 500
 # end of taskAPI()  ---------------------------------------------------------------------------------------------------
 
 @app.route('/tasks', methods=['POST'])
 def addTaskAPI():
-    print('@addTaskAPI---------------------')
     data = request.get_json()
     taskName = data.get("name")
     taskDesc = data.get("description")
@@ -202,7 +241,7 @@ def addTaskAPI():
 
     try:
         task = Task(user=user, name=taskName, description=taskDesc, status=taskStat, priority=priority, deadline=deadline)
-        connection = get_db_connection()
+        connection = getDBConnection()
     except:
         connection.close()
         return jsonify({"status": "failed", "message": "Something went wrong. Please try again later."}), 500
@@ -226,7 +265,6 @@ def addTaskAPI():
 
 @app.route('/tasks', methods=['PUT'])
 def editTaskAPI():
-    print('@editTaskAPI---------------------')
     data = request.get_json()
     taskId = data.get("taskId")
     taskName = data.get("name")
@@ -241,7 +279,7 @@ def editTaskAPI():
 
 
     try:
-        connection = get_db_connection()
+        connection = getDBConnection()
     except:
         connection.close()
         return jsonify({"status": "failed", "message": "Something went wrong. Please try again later."}), 500
@@ -265,7 +303,6 @@ def editTaskAPI():
 
 @app.route('/tasks', methods=['DELETE'])
 def deleteTaskAPI():
-    print('@deleteTaskAPI---------------------')
     data = request.get_json()
     taskId = data.get("taskId")
     user = request.headers.get('Authorization')
@@ -275,7 +312,7 @@ def deleteTaskAPI():
 
 
     try:
-        connection = get_db_connection()
+        connection = getDBConnection()
     except:
         connection.close()
         return jsonify({"status": "failed", "message": "Something went wrong. Please try again later."}), 500
