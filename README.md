@@ -50,8 +50,10 @@ SHOW TABLES;
 - Navigate to project folder
 - Create a virtual environment using the command : `python -m venv venv`
 - Run `.\venv\Scripts\activate`
-- Install backend packages using : `pip install -r requirements.txt`
-- Navigate to `backend` folder & run `python .\app.py`
+- Navigate to `backend` folder & install backend packages using : `pip install -r requirements.txt`
+- Download the .env file from `https://drive.google.com/file/d/1Z0eG2fGDcEGFmkCDzO16xUDjiaGK1WIx/view?usp=drive_link` and copy it to the backend folder.
+    - This file contains the access-key for Open-AI's APIs and is required to run the app.
+- Run `python .\app.py`
 - Verify backend status by opening `http://localhost:5000` in the browser.
 - Navigate to `frontend` folder
 - Install frontend packages using the command : `npm install`
